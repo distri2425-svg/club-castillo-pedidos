@@ -1,0 +1,2 @@
+GET http://localhost:8081/orders/restaurant/2
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwiaWF0IjoxNzUxNjE4MTQ2LCJleHAiOjE3NTE3MDQ1NDZ9.OWqybESmRR32vLtfs0ASdbSfvkUfikGl7MblDW-KGNA

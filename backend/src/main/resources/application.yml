@@ -1,0 +1,69 @@
+# Las credenciales se resuelven desde variables de entorno y nunca se escriben en
+# este archivo, que si se versiona. El archivo .env del directorio del modulo se
+# importa como origen de propiedades del propio Spring, de modo que sus valores
+# estan disponibles antes de que se construya el datasource; esto tambien aplica
+# al arrancar las pruebas. La importacion es opcional: si no existe .env se usan
+# los valores por defecto, que corresponden a una instalacion local estandar y
+# sirven unicamente para que el proyecto arranque sin configuracion previa.
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  datasource:
+    # DB_IP conserva el nombre historico del proyecto pero transporta la URL JDBC
+    # completa, no unicamente el equipo. Al desplegar con Docker Compose, la
+    # variable SPRING_DATASOURCE_URL que define el servicio tiene precedencia
+    # sobre este valor.
+    url: ${DB_IP:jdbc:postgresql://localhost:5432/castillo_db}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+application:
+  security:
+    jwt:
+      # Sin valor por omision: si SECRET_KEY_JWT no esta definida la
+      # aplicacion no arranca, en lugar de firmar con una clave conocida.
+      secret-key: ${SECRET_KEY_JWT}
+      expiration: 86400000 # 1 día
+
+server:
+  port: 8081
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+
+
+# Origenes autorizados para las peticiones de origen cruzado. En desarrollo
+# basta el valor por defecto; en despliegue se declara ALLOWED_ORIGINS en el
+# archivo .env con el dominio publico del sistema.
+app:
+  cors:
+    # En desarrollo se admiten tanto localhost como 127.0.0.1: el navegador
+    # envia como origen la direccion exacta que figura en la barra, y el filtro
+    # rechaza con "Invalid CORS request" cualquiera que no conste aqui.
+    allowed-origins: ${ALLOWED_ORIGINS:http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000}
+  # Clave con la que se crean las cuentas iniciales del sistema. Si no se
+  # declara, el arranque genera una aleatoria y la registra en la bitacora.
+  seed:
+    password: ${SEED_USER_PASSWORD:}
+
+# Asistente virtual. La credencial se declara como GEMINI_API_KEY en el archivo
+# .env del modulo y nunca se escribe aqui. Si no esta configurada, el asistente
+# responde con el repertorio local de la aplicacion del cliente.
+assistant:
+  gemini:
+    api-key: ${GEMINI_API_KEY:}
+    model: ${GEMINI_MODEL:gemini-3.6-flash}
