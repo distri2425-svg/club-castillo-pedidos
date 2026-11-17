@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,7 +52,11 @@ public class UserController {
         return ResponseEntity.ok(toDTO(user, true));
     }
 
+    // La administracion de cuentas (listar, crear, editar y dar de baja) queda
+    // reservada al propietario. Antes bastaba una sesion valida, de modo que la
+    // restriccion existia unicamente en la interfaz.
     // --- Listar usuarios CON PAGINACIÓN (sin imagen base64) ---
+    @PreAuthorize("hasRole('OWNER')")
     @GetMapping
     @Transactional(readOnly = true)
     public ResponseEntity<Map<String, Object>> getUsers(
@@ -90,6 +95,7 @@ public class UserController {
     }
 
     // --- NUEVO: Endpoint para obtener imágenes de usuarios específicos ---
+    @PreAuthorize("hasRole('OWNER')")
     @GetMapping("/images")
     @Transactional(readOnly = true)
     public ResponseEntity<Map<Long, String>> getUserImages(@RequestParam List<Long> userIds) {
@@ -106,6 +112,7 @@ public class UserController {
     }
 
     // --- Crear usuario ---
+    @PreAuthorize("hasRole('OWNER')")
     @PostMapping
     @Transactional
     public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
@@ -139,6 +146,7 @@ public class UserController {
     }
 
     // --- Editar usuario (con imagen) ---
+    @PreAuthorize("hasRole('OWNER')")
     @PutMapping("/{id}")
     @Transactional
     public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
@@ -171,6 +179,7 @@ public class UserController {
     }
 
     // --- LOPDP Art. 21: Derecho de supresión — anonimización real (admin) ---
+    @PreAuthorize("hasRole('OWNER')")
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
@@ -335,6 +344,7 @@ public class UserController {
         return ResponseEntity.ok(data);
     }
 
+    @PreAuthorize("hasRole('OWNER')")
     @GetMapping("/all")
     @Transactional(readOnly = true)
     public ResponseEntity<List<UserDTO>> getAllUsersByRole(@RequestParam(name = "role", required = false) String role) {
