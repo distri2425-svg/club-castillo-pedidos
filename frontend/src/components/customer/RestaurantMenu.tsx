@@ -228,7 +228,7 @@ const RestaurantMenu: React.FC = () => {
                     ) : (
                         filteredItems.map((item) => (
                             <PlatoCard
-                                key={item.id}
+                                key={`${beverages.includes(item) ? "bebida" : "plato"}-${item.id}`}
                                 item={item}
                                 beverages={beverages}
                                 addToCart={addToCart}
@@ -263,7 +263,11 @@ const PlatoCard: React.FC<PlatoCardProps> = ({
                                                  disabled = false,
                                              }) => {
     const [expanded, setExpanded] = useState(false);
-    const isBeverage = beverages.some((b) => b.id === item.id);
+    // Se compara el objeto y no solo el identificador: platos y bebidas
+    // provienen de tablas distintas y su numeracion coincide (el plato 4 y la
+    // bebida 4), por lo que la comparacion por id marcaba los platos como
+    // bebidas y el pedido se armaba con los productos equivocados.
+    const isBeverage = beverages.includes(item);
     const canOrder = item.available && !disabled;
 
     return (

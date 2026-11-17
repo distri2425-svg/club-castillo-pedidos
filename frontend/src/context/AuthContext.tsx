@@ -93,7 +93,11 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
             // Si el backend devuelve role ≠ INVITED cancelamos modo invitado
             const isGuest = user.role === "INVITED";
 
-            if (!isGuest) clearGuestArtifacts();
+            // Los restos de la sesion de invitado solo se limpian cuando un
+            // invitado pasa a identificarse con su cuenta. Antes se limpiaban en
+            // cada restablecimiento de sesion, de modo que al recargar la pagina
+            // el socio perdia su carrito y el pedido que estaba siguiendo.
+            if (!isGuest && auth.isGuest) clearGuestArtifacts();
 
             setAuth((prev) => ({
                 ...prev,

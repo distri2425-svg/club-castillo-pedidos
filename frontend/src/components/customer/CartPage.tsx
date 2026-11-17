@@ -179,7 +179,9 @@ const CartPage: React.FC = () => {
         if (isGuest) {
             params.push(`qrCode=${qrCode}`);
         } else {
-            const firstFood = cart.find((i) => i.type === "food");
+            // Si el pedido solo tiene bebidas, el restaurante se toma de ellas:
+            // todo producto del carrito guarda el restaurante donde se eligio.
+            const firstFood = cart.find((i) => i.type === "food") ?? cart[0];
             const restId = user?.restaurantId ?? (firstFood as any)?.restaurantId;
             if (!restId) {
                 alert("No se encontró restaurante. Vuelve al menú.");
