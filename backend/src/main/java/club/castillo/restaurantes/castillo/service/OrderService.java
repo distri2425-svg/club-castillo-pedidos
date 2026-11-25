@@ -303,13 +303,13 @@ public class OrderService {
                 if (!Boolean.TRUE.equals(beverage.getAvailable())) {
                     throw new RuntimeException("La bebida '" + beverage.getName() + "' no está disponible.");
                 }
-                // La carta de la unidad muestra toda bebida global disponible salvo
-                // que la unidad la haya deshabilitado de forma expresa.
-                boolean deshabilitadaEnLaUnidad = restaurantBeverageRepository
+                // La unidad solo vende las bebidas que su administrador anadio al
+                // menu (relacion en restaurant_beverages) y que no oculto.
+                boolean habilitadaEnLaUnidad = restaurantBeverageRepository
                         .findByRestaurantIdAndBeverageId(restaurant.getId(), beverage.getId())
-                        .map(rel -> !rel.isAvailable())
+                        .map(rel -> rel.isAvailable())
                         .orElse(false);
-                if (deshabilitadaEnLaUnidad) {
+                if (!habilitadaEnLaUnidad) {
                     throw new RuntimeException("La bebida '" + beverage.getName()
                             + "' no está habilitada en el restaurante del pedido.");
                 }

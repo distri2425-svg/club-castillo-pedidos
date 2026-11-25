@@ -72,8 +72,9 @@ const RestaurantMenu: React.FC = () => {
                 );
                 setMenuItems(resMenu.data);
 
+                // Solo las bebidas que la unidad anadio a su menu, no todo el catalogo
                 const resBeverages = await axios.get(
-                    `${API_URL}/beverages/restaurant/${restaurantId}`
+                    `${API_URL}/beverages/restaurant/${restaurantId}?soloCarta=true`
                 );
                 const bebidasConCategoria = resBeverages.data.map((b: any) => ({
                     ...b,

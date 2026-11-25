@@ -81,8 +81,13 @@ public class BeverageController {
     }
 
     // --- ENDPOINT PÚBLICO: listado de bebidas por restaurante ---
+    // Sin parametros devuelve todo el catalogo global (lo usa la pestana
+    // "Catalogo Global" del administrador). Con soloCarta=true devuelve solo
+    // las bebidas que la unidad anadio a su menu: es la carta del comensal.
     @GetMapping("/restaurant/{restaurantId}")
-    public List<BeverageDTO> getBeveragesForRestaurant(@PathVariable Long restaurantId) {
+    public List<BeverageDTO> getBeveragesForRestaurant(
+            @PathVariable Long restaurantId,
+            @RequestParam(name = "soloCarta", defaultValue = "false") boolean soloCarta) {
         List<Beverage> globalBeverages = beverageRepository.findByActiveTrueAndAvailableTrue();
         List<RestaurantBeverage> rels = restaurantBeverageRepository.findByRestaurantId(restaurantId);
 
@@ -93,6 +98,7 @@ public class BeverageController {
                 ));
 
         return globalBeverages.stream()
+                .filter(b -> !soloCarta || localState.containsKey(b.getId()))
                 .map(b -> {
                     boolean available = localState.getOrDefault(b.getId(), true);
                     return BeverageDTO.builder()
