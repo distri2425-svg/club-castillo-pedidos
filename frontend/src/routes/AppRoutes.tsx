@@ -63,7 +63,10 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; roles?: string[] }> 
     if (!isAuthenticated) {
         return <Navigate to="/login" replace />;
     }
-    if (roles && !isGuest && user && !roles.includes(user.role)) {
+    // El invitado tambien pasa por la comprobacion del rol: antes se le eximia,
+    // y una sesion de invitado podia abrir las pantallas del propietario o del
+    // administrador (el servidor negaba los datos, pero la pantalla mostraba errores).
+    if (roles && (isGuest || (user && !roles.includes(user.role)))) {
         return <Navigate to="/unauthorized" replace />;
     }
 
