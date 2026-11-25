@@ -245,13 +245,15 @@ public class UserController {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        String role = user.getRole().getName();
-        if ("OWNER".equals(role)) {
-            return ResponseEntity.status(403).build(); // O con mensaje personalizado si quieres
+        // Cualquier rol, incluido el propietario, edita aqui solo sus nombres y su
+        // foto: el correo y el rol no se toman del cuerpo de la peticion.
+        if (userDTO.getFirstName() == null || userDTO.getFirstName().isBlank()
+                || userDTO.getLastName() == null || userDTO.getLastName().isBlank()) {
+            return ResponseEntity.badRequest().build();
         }
 
-        user.setFirstName(userDTO.getFirstName());
-        user.setLastName(userDTO.getLastName());
+        user.setFirstName(userDTO.getFirstName().trim());
+        user.setLastName(userDTO.getLastName().trim());
         user.setProfileImageBase64(userDTO.getProfileImageBase64());
         user.setUpdatedAt(LocalDateTime.now());
 
