@@ -13,10 +13,10 @@ import api from '../../services/api';
  *
  * Desde esta vista el titular ejerce los derechos que la LOPDP le reconoce y
  * que el servidor ya expone:
- *  - Acceso (Art. 19): historial de sus propios pedidos.
- *  - Rectificacion (Art. 20): nombres y apellidos, persistidos en el servidor.
- *  - Supresion (Art. 21): baja de la cuenta con anonimizacion de los datos.
- *  - Portabilidad (Art. 22): exportacion de sus datos en formato JSON.
+ *  - Acceso (Art. 13): historial de sus propios pedidos.
+ *  - Rectificacion (Art. 14): nombres y apellidos, persistidos en el servidor.
+ *  - Supresion (Art. 15): baja de la cuenta con anonimizacion de los datos.
+ *  - Portabilidad (Art. 17): exportacion de sus datos en formato JSON.
  * En la version anterior el boton de guardar no llamaba al servidor y los
  * demas derechos solo podian ejercerse invocando la API directamente.
  */
@@ -152,7 +152,7 @@ const CustomerProfile: React.FC = () => {
         navigate('/login');
     };
 
-    // --- Rectificación (Art. 20): PUT /api/users/me ---
+    // --- Rectificación (Art. 14): PUT /api/users/me ---
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setProfileData({ ...profileData, [e.target.name]: e.target.value });
     };
@@ -182,7 +182,7 @@ const CustomerProfile: React.FC = () => {
         }
     };
 
-    // --- Portabilidad (Art. 22): GET /api/users/me/export ---
+    // --- Portabilidad (Art. 17): GET /api/users/me/export ---
     const handleExport = async () => {
         setExportando(true);
         try {
@@ -204,7 +204,7 @@ const CustomerProfile: React.FC = () => {
         }
     };
 
-    // --- Supresión (Art. 21): DELETE /api/users/me ---
+    // --- Supresión (Art. 15): DELETE /api/users/me ---
     const handleDeleteAccount = async () => {
         setEliminando(true);
         try {
@@ -328,19 +328,23 @@ const CustomerProfile: React.FC = () => {
                         className="w-full p-3 mb-4 border border-gray-200 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed"
                     />
                     <div className="flex gap-2">
+                        {/* Cada boton lleva su propia key: sin ella React reutilizaba el
+                            mismo <button> y lo convertia en "submit" durante el clic de
+                            "Editar", con lo que el formulario se enviaba y la edicion se
+                            cerraba de inmediato. */}
                         {!editing ? (
-                            <Button type="button" variant="primary" onClick={() => setEditing(true)}>Editar</Button>
+                            <Button key="editar" type="button" variant="primary" onClick={() => setEditing(true)}>Editar</Button>
                         ) : (
                             <>
-                                <Button type="submit" variant="success" loading={saving}>Guardar</Button>
-                                <Button type="button" variant="outline" onClick={() => setEditing(false)}>Cancelar</Button>
+                                <Button key="guardar" type="submit" variant="success" loading={saving}>Guardar</Button>
+                                <Button key="cancelar" type="button" variant="outline" onClick={() => setEditing(false)}>Cancelar</Button>
                             </>
                         )}
                     </div>
                 </form>
             </div>
 
-            {/* Historial de pedidos (Art. 19) */}
+            {/* Historial de pedidos (Art. 13) */}
             <div className="bg-white rounded-2xl shadow-sm border border-[#f89b01]/20 p-5">
                 <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2 mb-3">
                     <Package className="w-5 h-5 text-[#f89b01]" /> Mis pedidos
@@ -369,7 +373,7 @@ const CustomerProfile: React.FC = () => {
                 )}
             </div>
 
-            {/* Derechos LOPDP (Arts. 21 y 22) */}
+            {/* Derechos LOPDP (Arts. 15 y 17) */}
             <div className="bg-white rounded-2xl shadow-sm border border-[#f89b01]/20 p-5">
                 <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2 mb-1">
                     <ShieldCheck className="w-5 h-5 text-[#f89b01]" /> Tus datos personales
