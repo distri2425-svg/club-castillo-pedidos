@@ -20,7 +20,7 @@ const PrivacyPolicyPage: React.FC = () => {
         },
         {
             icon: <Database className="h-6 w-6" />,
-            title: '2. Datos que Recopilamos (Art. 10 LOPDP — Finalidad)',
+            title: '2. Datos que Recopilamos (Art. 10 LOPDP — Principios)',
             content: (
                 <div className="space-y-3 text-gray-300">
                     <p>Recopilamos únicamente los datos necesarios para el correcto funcionamiento del sistema de pedidos digitales:</p>
@@ -69,27 +69,27 @@ const PrivacyPolicyPage: React.FC = () => {
         },
         {
             icon: <Shield className="h-6 w-6" />,
-            title: '5. Tus Derechos (Arts. 19–22 LOPDP)',
+            title: '5. Tus Derechos (Arts. 13–17 LOPDP)',
             content: (
                 <div className="space-y-3 text-gray-300">
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <div className="bg-[#252525] rounded-xl p-4 border border-[#f89b01]/20">
                             <div className="flex items-center gap-2 mb-1 text-[#f89b01] font-semibold">
-                                <User className="h-4 w-4" /> Derecho de Acceso (Art. 19)
+                                <User className="h-4 w-4" /> Derecho de Acceso (Art. 13)
                             </div>
                             <p className="text-sm">Puedes consultar todos tus datos en <strong>Mi Perfil</strong>.</p>
                             <p className="text-xs text-gray-500 mt-1">API: <code className="text-[#f89b01]">GET /api/users/me</code></p>
                         </div>
                         <div className="bg-[#252525] rounded-xl p-4 border border-[#f89b01]/20">
                             <div className="flex items-center gap-2 mb-1 text-[#f89b01] font-semibold">
-                                <FileText className="h-4 w-4" /> Derecho de Rectificación (Art. 20)
+                                <FileText className="h-4 w-4" /> Derecho de Rectificación (Art. 14)
                             </div>
                             <p className="text-sm">Puedes actualizar tu nombre, apellido e imagen en <strong>Mi Perfil</strong>.</p>
                             <p className="text-xs text-gray-500 mt-1">API: <code className="text-[#f89b01]">PUT /api/users/me</code></p>
                         </div>
                         <div className="bg-[#252525] rounded-xl p-4 border border-[#f89b01]/20">
                             <div className="flex items-center gap-2 mb-1 text-red-400 font-semibold">
-                                <Trash2 className="h-4 w-4" /> Derecho de Supresión (Art. 21)
+                                <Trash2 className="h-4 w-4" /> Derecho de Supresión (Art. 15)
                             </div>
                             <p className="text-sm">Puedes solicitar la eliminación total de tus datos personales.</p>
                             <p className="text-xs text-gray-500 mt-1">Escríbenos a: <a href="mailto:privacidad@clubcastillo.com" className="text-[#f89b01] underline">privacidad@clubcastillo.com</a></p>
@@ -97,7 +97,7 @@ const PrivacyPolicyPage: React.FC = () => {
                         </div>
                         <div className="bg-[#252525] rounded-xl p-4 border border-[#f89b01]/20">
                             <div className="flex items-center gap-2 mb-1 text-green-400 font-semibold">
-                                <Download className="h-4 w-4" /> Derecho de Portabilidad (Art. 22)
+                                <Download className="h-4 w-4" /> Derecho de Portabilidad (Art. 17)
                             </div>
                             <p className="text-sm">Puedes descargar todos tus datos en formato JSON.</p>
                             <p className="text-xs text-gray-500 mt-1">API: <code className="text-[#f89b01]">GET /api/users/me/export</code></p>
@@ -108,7 +108,7 @@ const PrivacyPolicyPage: React.FC = () => {
         },
         {
             icon: <Lock className="h-6 w-6" />,
-            title: '6. Seguridad de los Datos (Art. 32 LOPDP)',
+            title: '6. Seguridad de los Datos (Art. 37 LOPDP)',
             content: (
                 <ul className="list-disc list-inside space-y-1 text-gray-300 ml-2">
                     <li>Las contraseñas se almacenan cifradas con <strong className="text-white">BCrypt</strong>.</li>

@@ -79,7 +79,7 @@ const Reports: React.FC = () => {
         { id: 0, icon: BarChart3, title: "Análisis Avanzado", desc: "Facturación real por restaurante" },
         { id: 1, icon: TrendingUp, title: "Métricas en Tiempo Real", desc: "Totales en vivo de pedidos e ingresos" },
         { id: 2, icon: PieChart, title: "Reportes Personalizados", desc: "Filtrado y desglose individual" },
-        { id: 3, icon: ShieldCheck, title: "Auditoría LOPDP", desc: "Consentimiento real de usuarios (Art. 9)" }
+        { id: 3, icon: ShieldCheck, title: "Auditoría LOPDP", desc: "Consentimiento real de usuarios (Art. 8)" }
     ];
 
     const fetchRealData = async () => {
@@ -583,7 +583,7 @@ const Reports: React.FC = () => {
                                 Auditoría de Protección de Datos LOPDP (Usuarios Reales)
                             </h2>
                             <p className="text-xs text-slate-500 font-semibold mt-0.5">
-                                Registro de usuarios registrados en PostgreSQL y estado de consentimiento (Art. 9 y 22 LOPDP Ecuador)
+                                Registro de usuarios registrados en PostgreSQL y estado de consentimiento (Art. 8 y 15 LOPDP Ecuador)
                             </p>
                         </div>
                         <span className="text-xs font-black bg-[#f89b01]/10 text-[#f89b01] px-3 py-1 rounded-full border border-[#f89b01]/30">
@@ -712,7 +712,7 @@ const Reports: React.FC = () => {
                 {/* 4. Auditoría de Consentimientos LOPDP */}
                 <div className="space-y-2">
                     <div className="p-2.5 bg-amber-50 border border-[#f89b01]/30 rounded-lg text-slate-900 text-[11px] font-semibold">
-                        <span className="font-black text-[#f89b01]">CERTIFICADO LOPDP ECUADOR:</span> Cumplimiento verificado del Art. 9 de la Ley Orgánica de Protección de Datos Personales del Ecuador. Consentimiento otorgado explícitamente en el inicio de sesión.
+                        <span className="font-black text-[#f89b01]">CERTIFICADO LOPDP ECUADOR:</span> Cumplimiento verificado del Art. 8 de la Ley Orgánica de Protección de Datos Personales del Ecuador. Consentimiento otorgado explícitamente en el inicio de sesión.
                     </div>
 
                     <p className="font-extrabold text-xs uppercase tracking-wider text-slate-900">III. Registro Nominativo Auditado de Usuarios (PostgreSQL)</p>
@@ -735,7 +735,7 @@ const Reports: React.FC = () => {
                                     <td className="p-2 border border-slate-300">{u.email}</td>
                                     <td className="p-2 border border-slate-300">{u.roleName}</td>
                                     <td className="p-2 border border-slate-300 font-black">
-                                        {u.consentGiven ? 'ACEPTADO (Art. 9)' : 'ANONIMIZADO (Art. 22)'}
+                                        {u.consentGiven ? 'ACEPTADO (Art. 8)' : 'ANONIMIZADO (Art. 15)'}
                                     </td>
                                     <td className="p-2 border border-slate-300">{u.consentDate}</td>
                                 </tr>

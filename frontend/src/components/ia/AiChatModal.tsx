@@ -88,7 +88,7 @@ export default function AiChatModal({ open, onClose }: { open: boolean; onClose:
             return "🍽️ **Gastronomía del Club:**\nContamos con variedad de restaurantes que ofrecen platillos tradicionales ecuatorianos, parrilladas gourmet, repostería y bebidas frías. Explora el catálogo en vivo desde nuestro sistema.";
         }
         if (q.includes("seguridad") || q.includes("lopdp") || q.includes("datos") || q.includes("privacidad")) {
-            return "🛡️ **Protección de Datos LOPDP:**\nTus datos personales y de cuenta se encuentran protegidos bajo estricto cumplimiento del Art. 9 de la Ley Orgánica de Protección de Datos Personales del Ecuador.";
+            return "🛡️ **Protección de Datos LOPDP:**\nTus datos personales y de cuenta se encuentran protegidos bajo estricto cumplimiento del Art. 8 de la Ley Orgánica de Protección de Datos Personales del Ecuador.";
         }
         if (q.includes("hola") || q.includes("buenas") || q.includes("saludos")) {
             return "¡Un gusto saludarte! Estoy listo para responder tus dudas sobre el Club Castillo de Amaguaña, restaurantes, zonas de entrega o soporte para tu pedido.";

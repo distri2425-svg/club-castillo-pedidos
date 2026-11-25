@@ -24,7 +24,7 @@ public class UserDTO {
     private List<Long> restauranteIds;
 
     /**
-     * LOPDP Art. 9: constancia del consentimiento otorgado por el titular. Se
+     * LOPDP Art. 8: constancia del consentimiento otorgado por el titular. Se
      * expone porque el registro de auditoria del propietario se construye sobre
      * estos dos valores; sin ellos la consulta nunca podia mostrarlos.
      */

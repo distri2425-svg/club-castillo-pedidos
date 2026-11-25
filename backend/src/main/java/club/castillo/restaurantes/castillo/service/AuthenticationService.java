@@ -29,7 +29,7 @@ public class AuthenticationService {
         Role customerRole = roleRepository.findByName(RoleType.CUSTOMER)
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
-        // LOPDP Art. 9: registrar consentimiento
+        // LOPDP Art. 8: registrar consentimiento
         LocalDateTime now = LocalDateTime.now();
         var user = User.builder()
                 .firstName(request.getFirstName())
@@ -59,7 +59,7 @@ public class AuthenticationService {
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow();
 
-        // LOPDP Art. 9: el consentimiento otorgado en la pantalla de acceso se
+        // LOPDP Art. 8: el consentimiento otorgado en la pantalla de acceso se
         // registra una sola vez, con su fecha, para las cuentas que aun no lo
         // tienen (por ejemplo, las sembradas antes de incorporar la casilla).
         if (request.isConsentGiven() && !user.isConsentGiven()) {

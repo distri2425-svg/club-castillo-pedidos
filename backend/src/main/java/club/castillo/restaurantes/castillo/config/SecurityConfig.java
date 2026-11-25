@@ -30,7 +30,7 @@ public class SecurityConfig {
     private final AuthenticationProvider authenticationProvider;
 
     /**
-     * LOPDP Art. 32 — Seguridad de datos.
+     * LOPDP Art. 37 — Seguridad de datos.
      * En producción, define: ALLOWED_ORIGINS=https://clubcastillo.com
      * En desarrollo no es necesario configurar (usa localhost por defecto).
      */

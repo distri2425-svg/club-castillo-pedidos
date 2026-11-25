@@ -51,7 +51,7 @@ public class User implements UserDetails {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // ── LOPDP Art. 9: Consentimiento informado ──────────────────────────────
+    // ── LOPDP Art. 8: Consentimiento informado ──────────────────────────────
     /** Indica si el titular otorgó consentimiento explícito al registrarse. */
     @Column(name = "consent_given", nullable = false, columnDefinition = "boolean default false")
     @Builder.Default
@@ -61,7 +61,7 @@ public class User implements UserDetails {
     @Column(name = "consent_date")
     private LocalDateTime consentDate;
 
-    // ── LOPDP Art. 21: Derecho de supresión (fecha de anonimización) ────────
+    // ── LOPDP Art. 15: Derecho de supresión (fecha de anonimización) ────────
     /** Fecha en que se ejerció el derecho al olvido. Null = activo. */
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;

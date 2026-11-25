@@ -18,6 +18,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByRestaurantIdAndCreatedAtBetween(Long restaurantId, LocalDateTime start, LocalDateTime end);
     List<Order> findByRestaurantIdAndActiveTrue(Long restaurantId);
     Optional<Order> findByIdAndActiveTrue(Long id);
-    /** LOPDP Art. 21 y 22: obtener todos los pedidos de un usuario para anonimizar o exportar. */
+    /** LOPDP Art. 15 y 17: obtener todos los pedidos de un usuario para anonimizar o exportar. */
     List<Order> findByCustomer(User customer);
 } 

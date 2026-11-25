@@ -21,7 +21,7 @@ export interface AuthResponse {
 }
 
 export const authService = {
-  // consentGiven: LOPDP Art. 9. La casilla de la pantalla de acceso se envia al
+  // consentGiven: LOPDP Art. 8. La casilla de la pantalla de acceso se envia al
   // servidor, que registra el consentimiento con su fecha si la cuenta aun no
   // lo tiene. Antes la casilla solo habilitaba el boton y no se persistia.
   async login(email: string, password: string, consentGiven = false): Promise<AuthResponse> {

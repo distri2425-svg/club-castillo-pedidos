@@ -200,7 +200,7 @@ const LoginForm: React.FC = () => {
     const [error, setError] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-    // LOPDP Art. 9: consentimiento explícito — inicia en false, el usuario debe marcarlo activamente
+    // LOPDP Art. 8: consentimiento explícito — inicia en false, el usuario debe marcarlo activamente
     const [consentAccepted, setConsentAccepted] = useState(false);
 
     const { refreshUser, loginAsGuest } = useAuth();
@@ -438,7 +438,7 @@ const LoginForm: React.FC = () => {
                                     </motion.div>
                                 )}
 
-                                {/* LOPDP Art. 9: Consentimiento explícito — OBLIGATORIO, no pre-marcado */}
+                                {/* LOPDP Art. 8: Consentimiento explícito — OBLIGATORIO, no pre-marcado */}
                                 <motion.div
                                     initial={{ opacity: 0, y: 8 }}
                                     animate={{ opacity: 1, y: 0 }}

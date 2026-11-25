@@ -14,6 +14,6 @@ public class RegisterRequest {
     private String lastName;
     private String email;
     private String password;
-    /** LOPDP Art. 9: consentimiento explícito marcado por el usuario en el formulario. */
+    /** LOPDP Art. 8: consentimiento explícito marcado por el usuario en el formulario. */
     private boolean consentGiven;
 } 
