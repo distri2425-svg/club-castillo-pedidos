@@ -1,6 +1,7 @@
 package club.castillo.restaurantes.castillo.dto;
 
 import club.castillo.restaurantes.castillo.model.OrderStatus;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,6 +24,10 @@ public class OrderDTO {
     private List<OrderBeverageDTO> beverages;
     private OrderStatus status;
     private BigDecimal total;
+    // Sin la anotacion, Jackson publica el campo como "guest" (deriva el nombre
+    // del getter isGuest()) y el reporte del propietario, que lee "isGuest",
+    // contaba todos los pedidos como de socios.
+    @JsonProperty("isGuest")
     private boolean isGuest;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

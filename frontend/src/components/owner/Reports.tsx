@@ -68,6 +68,8 @@ const Reports: React.FC = () => {
     const [allUsers, setAllUsers] = useState<RealUserLog[]>([]);
     const [totalRevenue, setTotalRevenue] = useState<number>(0);
     const [totalOrdersCount, setTotalOrdersCount] = useState<number>(0);
+    // Pedidos que no fueron cancelados: base del ticket promedio
+    const [validOrdersCount, setValidOrdersCount] = useState<number>(0);
     const [lastSyncDate, setLastSyncDate] = useState<Date | null>(null);
     // Detalle de los pedidos del periodo: sostiene las hojas de desglose del libro
     // de Excel, que van mas alla de los totales que se muestran en pantalla.
@@ -109,6 +111,7 @@ const Reports: React.FC = () => {
 
             let grandTotalRevenue = 0;
             let grandTotalOrders = 0;
+            let grandValidOrders = 0;
             const pedidosDelPeriodo: OrderWithRestaurant[] = [];
 
             const salesReports: RestaurantSalesReport[] = await Promise.all(
@@ -132,12 +135,16 @@ const Reports: React.FC = () => {
                             return true;
                         });
 
-                        const rev = filteredOrders.reduce((sum, ord) => sum + (Number(ord.total) || 0), 0);
+                        // Un pedido cancelado se cuenta como registrado, pero no es venta:
+                        // no suma al ingreso ni al ticket promedio.
+                        const validos = filteredOrders.filter((ord) => ord.status !== 'CANCELLED');
+                        const rev = validos.reduce((sum, ord) => sum + (Number(ord.total) || 0), 0);
                         const count = filteredOrders.length;
-                        const avg = count > 0 ? rev / count : 0;
+                        const avg = validos.length > 0 ? rev / validos.length : 0;
 
                         grandTotalRevenue += rev;
                         grandTotalOrders += count;
+                        grandValidOrders += validos.length;
                         pedidosDelPeriodo.push(
                             ...filteredOrders.map((ord) => ({ ...ord, restaurantName: r.name }))
                         );
@@ -171,6 +178,7 @@ const Reports: React.FC = () => {
             );
             setTotalRevenue(grandTotalRevenue);
             setTotalOrdersCount(grandTotalOrders);
+            setValidOrdersCount(grandValidOrders);
             setLastSyncDate(new Date());
         } catch (error) {
             console.error('Error al obtener datos reales de reportes:', error);
@@ -390,7 +398,7 @@ const Reports: React.FC = () => {
                         </div>
                     </div>
                     <p className="text-3xl font-black text-[#181818] mt-3">
-                        ${totalOrdersCount > 0 ? (totalRevenue / totalOrdersCount).toFixed(2) : '0.00'}
+                        ${validOrdersCount > 0 ? (totalRevenue / validOrdersCount).toFixed(2) : '0.00'}
                     </p>
                     <p className="text-xs text-slate-500 font-semibold mt-2">Promedio gastado por orden</p>
                 </div>
@@ -662,7 +670,7 @@ const Reports: React.FC = () => {
                         <div className="border-r border-slate-200 pr-2">
                             <span className="text-slate-500 block text-[10px] uppercase">Ticket Promedio</span>
                             <span className="text-base font-black text-amber-700">
-                                ${totalOrdersCount > 0 ? (totalRevenue / totalOrdersCount).toFixed(2) : '0.00'}
+                                ${validOrdersCount > 0 ? (totalRevenue / validOrdersCount).toFixed(2) : '0.00'}
                             </span>
                         </div>
                         <div>

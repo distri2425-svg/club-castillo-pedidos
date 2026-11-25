@@ -88,19 +88,24 @@ export function construirHojasReporte(datos: DatosReporte): Hoja[] {
     const { generado, ventas, pedidos, usuarios, totalVentas, totalPedidos } = datos;
 
     const rotulo = ETIQUETA_RANGO[datos.rango] ?? 'Histórico completo';
-    const ticketPromedio = totalPedidos > 0 ? totalVentas / totalPedidos : 0;
+    // Un pedido cancelado se cuenta como registrado, pero no es venta: no suma
+    // al ingreso ni entra en el ticket promedio. totalVentas ya llega sin ellos.
+    const esVenta = (pedido: PedidoDetallado) => pedido.status !== 'CANCELLED';
+    const pedidosValidos = pedidos.filter(esVenta).length;
+    const ticketPromedio = pedidosValidos > 0 ? totalVentas / pedidosValidos : 0;
     const abiertos = ventas.filter((r) => r.status === 'OPEN').length;
     const consentidos = usuarios.filter((u) => u.consentGiven).length;
     const coberturaConsentimiento = usuarios.length > 0 ? consentidos / usuarios.length : 0;
 
     // Agrupaciones que alimentan el tablero.
     const porEstado = new Map<string, { pedidos: number; ventas: number }>();
-    const porDia = new Map<string, { pedidos: number; ventas: number }>();
+    const porDia = new Map<string, { pedidos: number; validos: number; ventas: number }>();
     let pedidosInvitado = 0;
     let ventasInvitado = 0;
 
     pedidos.forEach((pedido) => {
         const importe = Number(pedido.total) || 0;
+        const venta = esVenta(pedido) ? importe : 0;
 
         const estado = porEstado.get(pedido.status) ?? { pedidos: 0, ventas: 0 };
         estado.pedidos += 1;
@@ -111,16 +116,17 @@ export function construirHojasReporte(datos: DatosReporte): Hoja[] {
             const fecha = new Date(pedido.createdAt);
             if (!Number.isNaN(fecha.getTime())) {
                 const clave = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(fecha.getDate()).padStart(2, '0')}`;
-                const dia = porDia.get(clave) ?? { pedidos: 0, ventas: 0 };
+                const dia = porDia.get(clave) ?? { pedidos: 0, validos: 0, ventas: 0 };
                 dia.pedidos += 1;
-                dia.ventas += importe;
+                if (esVenta(pedido)) dia.validos += 1;
+                dia.ventas += venta;
                 porDia.set(clave, dia);
             }
         }
 
         if (pedido.isGuest) {
             pedidosInvitado += 1;
-            ventasInvitado += importe;
+            ventasInvitado += venta;
         }
     });
 
@@ -199,7 +205,8 @@ export function construirHojasReporte(datos: DatosReporte): Hoja[] {
     resumen.push([], seccion('ESTADO DE LOS PEDIDOS'), [
         { v: 'Estado', e: 'encabezado' },
         { v: 'Pedidos', e: 'encabezado' },
-        { v: 'Ventas', e: 'encabezado' },
+        // Importe y no "Ventas": incluye el de los cancelados, que no es venta
+        { v: 'Importe', e: 'encabezado' },
         { v: 'Proporción', e: 'encabezado' },
         { v: 'Peso relativo', e: 'encabezado' },
     ]);
@@ -330,7 +337,7 @@ export function construirHojasReporte(datos: DatosReporte): Hoja[] {
             { v: '', e: 'total' },
             { v: '', e: 'total' },
             { v: '', e: 'total' },
-            { v: 'TOTAL', e: 'total' },
+            { v: 'VENTAS (sin cancelados)', e: 'total' },
             { v: totalVentas, e: 'totalMoneda' },
         ]);
     }
@@ -352,7 +359,7 @@ export function construirHojasReporte(datos: DatosReporte): Hoja[] {
                     { v: serieFecha(new Date(anio, mes - 1, dia)), e: 'fechaCorta' },
                     { v: valores.pedidos, e: 'numero' },
                     { v: valores.ventas, e: 'moneda' },
-                    { v: valores.pedidos > 0 ? valores.ventas / valores.pedidos : 0, e: 'moneda' },
+                    { v: valores.validos > 0 ? valores.ventas / valores.validos : 0, e: 'moneda' },
                     { v: barra(totalVentas > 0 ? valores.ventas / totalVentas : 0), e: 'texto' },
                 ];
             }),
