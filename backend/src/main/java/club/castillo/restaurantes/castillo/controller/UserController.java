@@ -135,7 +135,7 @@ public class UserController {
                 .profileImageBase64(userDTO.getProfileImageBase64())
                 .active(true)
                 .createdAt(LocalDateTime.now())
-                // LOPDP Art. 9: si la cuenta se crea con constancia del
+                // LOPDP Art. 8: si la cuenta se crea con constancia del
                 // consentimiento del titular, se registra con su fecha.
                 .consentGiven(userDTO.isConsentGiven())
                 .consentDate(userDTO.isConsentGiven() ? LocalDateTime.now() : null)
@@ -178,18 +178,31 @@ public class UserController {
         return ResponseEntity.ok(toDTO(user, true));
     }
 
-    // --- LOPDP Art. 21: Derecho de supresión — anonimización real (admin) ---
+    // --- LOPDP Art. 15: Derecho de supresión — anonimización real (admin) ---
     @PreAuthorize("hasRole('OWNER')")
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        if ("OWNER".equals(user.getRole().getName())) {
+        String rol = user.getRole().getName();
+        // El propietario no se elimina; la cuenta del invitado es compartida por
+        // todos los invitados, y anonimizarla desvincularia los pedidos de todos.
+        if ("OWNER".equals(rol) || "INVITED".equals(rol)) {
             return ResponseEntity.status(403).build();
         }
+        anonimizar(user);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Supresion con conservacion del registro contable (Art. 15 y Art. 18 num. 2):
+     * se sustituyen los datos identificativos de la cuenta y tambien el nombre que
+     * cada pedido copio al registrarse, de modo que ventas e historial se conservan
+     * sin identificar al titular.
+     */
+    private void anonimizar(User user) {
         LocalDateTime now = LocalDateTime.now();
-        // Anonimizar datos personales — se mantiene el registro por auditoría contable
         user.setFirstName("[Eliminado]");
         user.setLastName("[Eliminado]");
         user.setEmail("deleted_" + user.getId() + "@noreply.castillo");
@@ -197,16 +210,15 @@ public class UserController {
         user.setActive(false);
         user.setDeletedAt(now);
         user.setUpdatedAt(now);
-        // Desvincular pedidos del usuario (conservar historial sin datos personales)
         orderRepository.findByCustomer(user).forEach(order -> {
             order.setCustomer(null);
+            order.setCustomerName("[Eliminado]");
             orderRepository.save(order);
         });
         userRepository.save(user);
-        return ResponseEntity.ok().build();
     }
 
-    // --- LOPDP Art. 21: Derecho de supresión — auto-eliminación del usuario autenticado ---
+    // --- LOPDP Art. 15: Derecho de supresión — auto-eliminación del usuario autenticado ---
     @DeleteMapping("/me")
     @Transactional
     public ResponseEntity<?> deleteCurrentUser(Authentication authentication) {
@@ -215,22 +227,14 @@ public class UserController {
         }
         User user = userRepository.findByEmail(authentication.getName())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        if ("OWNER".equals(user.getRole().getName())) {
+        String rol = user.getRole().getName();
+        if ("OWNER".equals(rol)) {
             return ResponseEntity.status(403).body("El propietario no puede auto-eliminarse");
         }
-        LocalDateTime now = LocalDateTime.now();
-        user.setFirstName("[Eliminado]");
-        user.setLastName("[Eliminado]");
-        user.setEmail("deleted_" + user.getId() + "@noreply.castillo");
-        user.setProfileImageBase64(null);
-        user.setActive(false);
-        user.setDeletedAt(now);
-        user.setUpdatedAt(now);
-        orderRepository.findByCustomer(user).forEach(order -> {
-            order.setCustomer(null);
-            orderRepository.save(order);
-        });
-        userRepository.save(user);
+        if ("INVITED".equals(rol)) {
+            return ResponseEntity.status(403).body("La cuenta de invitado es compartida y no se elimina");
+        }
+        anonimizar(user);
         return ResponseEntity.ok().body("Datos personales eliminados correctamente");
     }
 
@@ -288,7 +292,7 @@ public class UserController {
                 user.getConsentDate()
         );
     }
-    // --- LOPDP Art. 19: Derecho de acceso — historial de pedidos propios ---
+    // --- LOPDP Art. 13: Derecho de acceso — historial de pedidos propios ---
     @GetMapping("/me/orders")
     @Transactional(readOnly = true)
     public ResponseEntity<List<Map<String, Object>>> getMyOrders(Authentication authentication) {
@@ -309,7 +313,7 @@ public class UserController {
         return ResponseEntity.ok(orders);
     }
 
-    // --- LOPDP Art. 22: Derecho de portabilidad — exportar todos los datos propios ---
+    // --- LOPDP Art. 17: Derecho de portabilidad — exportar todos los datos propios ---
     @GetMapping("/me/export")
     @Transactional(readOnly = true)
     public ResponseEntity<Map<String, Object>> exportMyData(Authentication authentication) {
