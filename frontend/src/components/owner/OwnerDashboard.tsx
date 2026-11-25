@@ -25,9 +25,17 @@ interface DashboardStats {
     closedRestaurants: number;
     totalUsers: number;
     totalZones: number;
+    totalOrders: number;
     totalOrdersToday: number;
     totalRevenueToday: number;
     recentRestaurants: Restaurant[];
+}
+
+// Pedido tal como lo entrega GET /orders/restaurant/{id}
+interface OrderSummary {
+    status?: string;
+    total?: number | string;
+    createdAt?: string;
 }
 
 // ─── Tarjeta KPI Castillo (Sin Verde - Solo Dorado, Negro y Ámbar) 
@@ -112,10 +120,12 @@ const OwnerDashboard: React.FC = () => {
         closedRestaurants: 0,
         totalUsers: 0,
         totalZones: 0,
+        totalOrders: 0,
         totalOrdersToday: 0,
         totalRevenueToday: 0,
         recentRestaurants: [],
     });
+    const [ordersSynced, setOrdersSynced] = useState(true);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -150,14 +160,30 @@ const OwnerDashboard: React.FC = () => {
             const openCount = restaurants.filter(r => r.status === 'OPEN').length;
             const closedCount = restaurants.filter(r => r.status === 'CLOSED').length;
 
+            // Pedidos de cada unidad, con la misma fuente que el reporte ejecutivo
+            const ordersByRestaurant = await Promise.allSettled(
+                restaurants.map(r => axios.get(`/orders/restaurant/${r.id}`, { headers: authHeader }))
+            );
+            const orders: OrderSummary[] = ordersByRestaurant.flatMap(res =>
+                res.status === 'fulfilled' && Array.isArray(res.value.data) ? res.value.data : []
+            );
+            const todayStr = new Date().toDateString();
+            // Las ventas del dia excluyen los pedidos cancelados, que no generan ingreso
+            const todayOrders = orders.filter(o =>
+                o.status !== 'CANCELLED' && !!o.createdAt && new Date(o.createdAt).toDateString() === todayStr
+            );
+            const revenueToday = todayOrders.reduce((sum, o) => sum + (Number(o.total) || 0), 0);
+
+            setOrdersSynced(ordersByRestaurant.every(res => res.status === 'fulfilled'));
             setStats({
                 totalRestaurants: restaurants.length,
                 openRestaurants: openCount,
                 closedRestaurants: closedCount,
                 totalUsers: users.length,
                 totalZones: zones.length,
-                totalOrdersToday: 0,
-                totalRevenueToday: 0,
+                totalOrders: orders.length,
+                totalOrdersToday: todayOrders.length,
+                totalRevenueToday: revenueToday,
                 recentRestaurants: restaurants,
             });
             setLastUpdated(new Date());
@@ -276,7 +302,7 @@ const OwnerDashboard: React.FC = () => {
 
                 <CastilloKpi
                     title="Pedidos Registrados"
-                    value={stats.totalOrdersToday}
+                    value={stats.totalOrders}
                     subtitle="Total acumulado en el sistema"
                     icon={TrendingUp}
                     badgeText="En vivo"
@@ -489,10 +515,17 @@ const OwnerDashboard: React.FC = () => {
 
                     <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-semibold">
                         <span>Estado de transacciones</span>
-                        <span className="font-black text-[#f89b01] flex items-center gap-1.5">
-                            <span className="w-2 h-2 rounded-full bg-[#f89b01] animate-pulse" />
-                            Sincronizado
-                        </span>
+                        {ordersSynced ? (
+                            <span className="font-black text-[#f89b01] flex items-center gap-1.5">
+                                <span className="w-2 h-2 rounded-full bg-[#f89b01] animate-pulse" />
+                                Sincronizado
+                            </span>
+                        ) : (
+                            <span className="font-black text-red-600 flex items-center gap-1.5">
+                                <span className="w-2 h-2 rounded-full bg-red-600" />
+                                Pedidos incompletos
+                            </span>
+                        )}
                     </div>
                 </div>
             </div>
