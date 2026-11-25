@@ -44,13 +44,12 @@ const CartPage: React.FC = () => {
         0
     );
 
-    /* ─────────────── Limpia qrCode la primera vez que cargas la página ───────────── */
+    /* ─────────────── Marca la primera carga de la página ─────────────────────────── */
+    // Antes se borraba aqui el qrCode guardado, y el invitado que llegaba al carrito
+    // por el icono de la barra perdia el QR con el que habia entrado: sin camara no
+    // podia confirmar. Ahora el QR guardado se conserva y se valida (efecto siguiente).
     useEffect(() => {
-        if (!sessionInitialized) {
-            localStorage.removeItem("qrCode");
-            setQrCode(null);
-            setSessionInitialized(true);
-        }
+        if (!sessionInitialized) setSessionInitialized(true);
     }, [sessionInitialized]);
 
     /* ─────────────── Sincroniza qrCode de la URL / localStorage ───────────────────── */
@@ -63,8 +62,14 @@ const CartPage: React.FC = () => {
             localStorage.setItem("qrCode", fromUrl);
             setQrCode(fromUrl);
         } else if (isGuest) {
-            localStorage.removeItem("qrCode");
-            setQrCode(null);
+            // QR con el que el invitado abrio la carta: se acepta solo si es el
+            // QR vigente del restaurante del carrito, igual que uno escaneado.
+            const saved = localStorage.getItem("qrCode");
+            if (saved && cart.length > 0) {
+                handleScanQr(saved);
+            } else {
+                setQrCode(null);
+            }
         } else {
             const saved = localStorage.getItem("qrCode");
             if (saved) setQrCode(saved);
@@ -110,8 +115,9 @@ const CartPage: React.FC = () => {
             /* rawCode no era URL */
         }
 
-        // 2. Restaurante al que pertenece el carrito
-        const firstFood = cart.find((i) => i.type === "food");
+        // 2. Restaurante al que pertenece el carrito (de un plato o, si solo hay
+        //    bebidas, de la bebida: todo producto guarda el restaurante donde se eligio)
+        const firstFood = cart.find((i) => i.type === "food") ?? cart[0];
         const cartRestaurantId = (firstFood as any)?.restaurantId ?? null;
 
         if (!cartRestaurantId) {
